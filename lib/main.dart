@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import './Home.dart';
+import './Scanner.dart';
+import './Map.dart';
+
 void main() => runApp(MyApp()); 
 
 class MyApp extends StatefulWidget{
@@ -13,9 +17,9 @@ class MyAppState extends State<MyApp>{
 
   int _selectedPage = 0; 
   final _pageOptions = [
-    Text('Home', style: TextStyle(fontSize: 36.0),),
-    Text('Scanner', style: TextStyle(fontSize: 36.0),),
-    Text('Map', style: TextStyle(fontSize: 36.0),),
+    HomePage(),
+    ScannerPage(),
+    MapPage(),
   ];
 
   @override

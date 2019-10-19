@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import './Home.dart';
-import './Scanner.dart';
-import './Map.dart';
+import 'Views/Home.dart';
+import 'Views/Scanner.dart';
+import 'Views/Map.dart';
 
 void main() => runApp(MyApp()); 
 
@@ -17,9 +17,9 @@ class MyAppState extends State<MyApp>{
 
   int _selectedPage = 0; 
   final _pageOptions = [
-    HomePage(),
-    ScannerPage(),
-    MapPage(),
+    HomeView(),
+    ScannerView(),
+    MapView(),
   ];
 
   @override

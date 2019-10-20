@@ -10,6 +10,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="qpon"
         android:icon="@mipmap/ic_launcher">
+        <activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -29,5 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        
     </application>
+    <uses-permission android:name="android.permission.CAMERA" />
 </manifest>

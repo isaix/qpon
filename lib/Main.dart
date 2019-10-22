@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 
-import './Home.dart';
-import './Scanner.dart';
-import './Map.dart';
+import 'Views/Home.dart';
+import 'Views/Scanner.dart';
+import 'Views/Map.dart';
 
-void main() => runApp(MyApp()); 
+void main() => runApp(Qpon());
 
-class MyApp extends StatefulWidget{
+class Qpon extends StatefulWidget{
   @override
   State<StatefulWidget> createState(){
-    return MyAppState();
+    return QponState();
   }
 }
 
-class MyAppState extends State<MyApp>{
+class QponState extends State<Qpon>{
 
   int _selectedPage = 0; 
   final _pageOptions = [
-    HomePage(),
-    ScannerPage(),
-    MapPage(),
+    HomeView(),
+    ScannerView(),
+    MapView(),
   ];
 
   @override
@@ -46,7 +46,7 @@ class MyAppState extends State<MyApp>{
               title: Text('Home')
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.device_unknown),
+              icon: Icon(Icons.camera_alt),
               title: Text('Scanner')
             ),
             BottomNavigationBarItem(

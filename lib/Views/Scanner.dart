@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 class ScannerView extends StatefulWidget {
   @override
-  _ScannerState createState() => new _ScannerState();
+  _ScannerState createState() => _ScannerState();
 }
 
 class _ScannerState extends State<ScannerView> {
@@ -32,7 +32,7 @@ class _ScannerState extends State<ScannerView> {
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
-          this.barcode = 'The user did not grant the camera permission!';
+          this.barcode = 'The user did not grant camera permissions!';
         });
       } else {
         setState(() => this.barcode = 'Unknown error: $e');

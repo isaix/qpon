@@ -3,12 +3,12 @@ import 'package:flutter/rendering.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 
-class ScannerPage extends StatefulWidget {
+class ScannerView extends StatefulWidget {
   @override
   _ScannerState createState() => new _ScannerState();
 }
 
-class _ScannerState extends State<ScannerPage> {
+class _ScannerState extends State<ScannerView> {
   String barcode = "";
 
   @override

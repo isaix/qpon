@@ -65,6 +65,7 @@ class RegisterPageState extends State<RegisterPage>{
         AuthResult result = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
         FirebaseUser user = result.user;
         user.sendEmailVerification();
+          
         Navigator.of(context).pop();
       }catch(e){
         print(e.message);

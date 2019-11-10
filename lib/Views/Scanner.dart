@@ -18,9 +18,22 @@ class _ScannerState extends State<ScannerView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: new MaterialButton(onPressed: scan, child: new Text("Scan")),
-      padding: const EdgeInsets.all(8.0),
+    return Column(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(left: 40, right: 40, bottom: 30),
+          child: Text(
+          'In order to recieve your coupon, please scan the QR code presented to you by the store.',
+          textAlign: TextAlign.center,         
+          ),
+        ),
+        RaisedButton(
+          onPressed: scan,
+          child: new Text("Scan QR code"),
+        ),
+      ],
+      mainAxisAlignment: MainAxisAlignment.center,
+
     );
   }
 

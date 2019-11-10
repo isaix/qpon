@@ -23,8 +23,11 @@ class _ScannerState extends State<ScannerView> {
         Padding(
           padding: EdgeInsets.only(left: 40, right: 40, bottom: 30),
           child: Text(
-          'In order to recieve your coupon, please scan the QR code presented to you by the store.',
-          textAlign: TextAlign.center,         
+            'In order to recieve your coupon, please scan the QR code presented to you by the store.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+            ),
           ),
         ),
         RaisedButton(
@@ -33,7 +36,6 @@ class _ScannerState extends State<ScannerView> {
         ),
       ],
       mainAxisAlignment: MainAxisAlignment.center,
-
     );
   }
 

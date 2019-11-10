@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
 import 'Views/Map.dart';
+import 'Login/LoginPage.dart';
 
-void main() => runApp(Qpon());
+void main(){
+  Crashlytics.instance.enableInDevMode = true;
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  runApp(Qpon());
+}
 
 class Qpon extends StatefulWidget{
   @override
@@ -14,14 +19,6 @@ class Qpon extends StatefulWidget{
 }
 
 class QponState extends State<Qpon>{
-
-  int _selectedPage = 0; 
-  final _pageOptions = [
-    HomeView(),
-    ScannerView(),
-    MapView(),
-  ];
-
   @override
   Widget build(BuildContext context){
     return MaterialApp(
@@ -29,34 +26,7 @@ class QponState extends State<Qpon>{
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
     ),
-    home: Scaffold(
-      appBar: AppBar(
-        title: Text('QPON'),),
-        body: _pageOptions[_selectedPage],
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedPage,
-          onTap: (int index){
-            setState(() {
-              _selectedPage = index;
-            });
-          },
-          items:[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Home')
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt),
-              title: Text('Scanner')
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              title: Text('Map')
-            ),
-          ]
-
-        ),
-      ),
+    home: new LoginPage(),
     );
   }
 }

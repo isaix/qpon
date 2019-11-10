@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "552809916715",
+    "firebase_url": "https://qpon-856bf.firebaseio.com",
+    "project_id": "qpon-856bf",
+    "storage_bucket": "qpon-856bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552809916715:android:4d06c7c7cee420523dfd6e",
+        "android_client_info": {
+          "package_name": "com.example.qpon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552809916715-cvevcuaasjqeb4pe3b2mnmc2ain4cpmo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQksXHOk49Ltmg5XUgIeYPT_jNUUQhrKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552809916715-cvevcuaasjqeb4pe3b2mnmc2ain4cpmo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

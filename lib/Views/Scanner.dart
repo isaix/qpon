@@ -34,6 +34,16 @@ class _ScannerState extends State<ScannerView> {
           onPressed: scan,
           child: new Text("Scan QR code"),
         ),
+        Padding(
+          padding: EdgeInsets.only(top: 30.0),
+          child: Text(
+            '(For testing) Scanned code is: ' + barcode,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16
+            ),
+          ),
+        ),
       ],
       mainAxisAlignment: MainAxisAlignment.center,
     );

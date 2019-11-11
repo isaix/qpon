@@ -1,3 +1,4 @@
+import 'package:Qpon/Views/Profile.dart';
 import 'package:flutter/material.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
@@ -14,6 +15,7 @@ class NavBarState extends State<NavBar>{
     HomeView(),
     ScannerView(),
     MapView(),
+    ProfileView(),
   ];
 
   @override
@@ -23,6 +25,9 @@ class NavBarState extends State<NavBar>{
         title: Text('QPON'),),
         body: _pageOptions[_selectedPage],
         bottomNavigationBar: BottomNavigationBar(
+          //backgroundColor: Colors.redAccent,
+          selectedItemColor: Colors.deepOrange,
+          unselectedItemColor: Colors.grey[500],
           currentIndex: _selectedPage,
           onTap: (int index){
             setState(() {
@@ -32,16 +37,20 @@ class NavBarState extends State<NavBar>{
           items:[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              title: Text('Home')
+              title: Text('Home'),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.camera_alt),
-              title: Text('Scanner')
+              title: Text('Scanner'),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.map),
-              title: Text('Map')
+              title: Text('Map'),
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text('Profile'),
+            )
           ]
 
         ),

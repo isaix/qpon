@@ -51,8 +51,8 @@ class LoginPageState extends State<LoginPage> {
                   ),
                   TextFormField(
                     validator: (input) {
-                      if (input.length < 8) {
-                        return 'Your password must be at least 8 characters long.';
+                      if (input.length < 6) {
+                        return 'Your password must be at least 6 characters long.';
                       }
                       return null;
                     },
@@ -72,7 +72,8 @@ class LoginPageState extends State<LoginPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                              builder: (context) => RegisterPage()));
+                              builder: (context) => RegisterPage(),
+                              fullscreenDialog: true));
                     },
                     child: Text('Don\'t have an account? Register here.'),
                   ),

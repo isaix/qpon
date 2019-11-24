@@ -1,4 +1,4 @@
-import 'package:Qpon/Login/LoginPage.dart';
+import 'package:Qpon/Views/LoginPage.dart';
 import 'package:flutter/material.dart';
 
 class ProfileView extends StatelessWidget{
@@ -12,7 +12,7 @@ class ProfileView extends StatelessWidget{
           child: Text('Log out'),
           onPressed:(){
             Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
+            context, MaterialPageRoute(builder: (context) => LoginView()));
           },
         ),
         ),

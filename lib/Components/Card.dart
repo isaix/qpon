@@ -20,7 +20,7 @@ class _CardComponentState extends State<CardComponent> {
   Widget build(BuildContext context) {
     return Container(
 
-      padding: EdgeInsets.fromLTRB(5.0, 10, 5, 0),
+      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

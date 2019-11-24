@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterView extends StatefulWidget {
   @override
-  RegisterPageState createState() => RegisterPageState();
+  RegisterViewState createState() => RegisterViewState();
 }
 
-class RegisterPageState extends State<RegisterPage> {
+class RegisterViewState extends State<RegisterView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _email, _password, _errorMessage, _currentEmail;
 

@@ -30,10 +30,10 @@ class RegisterViewState extends State<RegisterView> {
                 if (input.isEmpty) {
                   return 'You must enter an email.';
                 }
-                _currentEmail = input;
+                _currentEmail = input.trim();
                 return null;
               },
-              onSaved: (input) => _email = input,
+              onSaved: (input) => _email = input.trim(),
               decoration: InputDecoration(labelText: 'Email'),
             ),
             TextFormField(

@@ -2,6 +2,7 @@ import 'package:Qpon/NavBar.dart';
 import 'package:Qpon/Views/Register.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class LoginView extends StatefulWidget {
 class LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _email, _password, _errorMessage;
+  bool _remainLoggedIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,7 @@ class LoginViewState extends State<LoginView> {
                       }
                       return null;
                     },
-                    onSaved: (input) => _email = input,
+                    onSaved: (input) => _email = input.trim(),
                     decoration: InputDecoration(labelText: 'Email'),
                   ),
                   TextFormField(
@@ -62,9 +64,39 @@ class LoginViewState extends State<LoginView> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 8.0),
-                    child: RaisedButton(
+                    child: Row(
+                      children: <Widget>[
+                        Checkbox(
+                          value: _remainLoggedIn,
+                          onChanged: (bool value) {
+                            setState(() {
+                              _remainLoggedIn = value;
+                            });
+                          },
+                        ),
+                        Text('Remember me.'),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 4, bottom: 4),
+                    child: ButtonTheme(
+                      child: RaisedButton(
                       onPressed: login,
-                      child: Text('Login'),
+                      textColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 8, bottom: 8),
+                        child: Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      ),
+                    ),
                     ),
                   ),
                   MaterialButton(
@@ -141,6 +173,11 @@ class LoginViewState extends State<LoginView> {
         });
   }
 
+  void saveRemainLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remainLoggedIn', _remainLoggedIn);
+  }
+
   Future<void> login() async {
     final formState = _formKey.currentState;
 
@@ -151,6 +188,8 @@ class LoginViewState extends State<LoginView> {
         AuthResult result = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: _email, password: _password);
         FirebaseUser user = result.user;
+
+        saveRemainLoggedIn();
 
         Navigator.pop(context); //pop loading dialog
         //Navigator.push(context, MaterialPageRoute<void>(builder: (context) => NavBar()));

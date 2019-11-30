@@ -3,6 +3,7 @@ import 'package:Qpon/Login/RegisterPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -11,8 +12,13 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _email, _password, _errorMessage;
+  String _email, _password, _errorMessage, _userRole, _userID;
   bool _remainLoggedIn = false;
+  final ref = Firestore.instance;
+  var emailTextController =
+      new TextEditingController(text: "userdemo@qpon.com");
+  var passwordTextController = new TextEditingController(text: "12345678");
+  FirebaseUser _firebaseUser;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,7 @@ class LoginPageState extends State<LoginPage> {
               child: Column(
                 children: <Widget>[
                   TextFormField(
+                    controller: emailTextController,
                     validator: (input) {
                       if (input.isEmpty) {
                         return 'You must enter an email.';
@@ -52,6 +59,7 @@ class LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(labelText: 'Email'),
                   ),
                   TextFormField(
+                    controller: passwordTextController,
                     validator: (input) {
                       if (input.length < 6) {
                         return 'Your password must be at least 6 characters long.';
@@ -82,21 +90,21 @@ class LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.only(top: 4, bottom: 4),
                     child: ButtonTheme(
                       child: RaisedButton(
-                      onPressed: login,
-                      textColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 8, bottom: 8),
-                        child: Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 16,
+                        onPressed: login,
+                        textColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
-                      ),
-                    ),
                     ),
                   ),
                   MaterialButton(
@@ -108,6 +116,57 @@ class LoginPageState extends State<LoginPage> {
                               fullscreenDialog: true));
                     },
                     child: Text('Don\'t have an account? Register here.'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 30),
+                    child: Text('Autofill user information for testing:'),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      RaisedButton(
+                        onPressed: () {
+                          setState(() {
+                            emailTextController.text = 'userdemo@qpon.com';
+                            passwordTextController.text = '12345678';
+                          });
+                        },
+                        textColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                          child: Text(
+                            'Test as User',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                          setState(() {
+                            emailTextController.text = 'storedemo@qpon.com';
+                            passwordTextController.text = '12345678';
+                          });
+                        },
+                        textColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                          child: Text(
+                            'Test as Store',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -151,6 +210,10 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
+  void setEmailStore() {
+    setState(() {});
+  }
+
   void _onLoading() {
     showDialog(
         context: context,
@@ -178,6 +241,30 @@ class LoginPageState extends State<LoginPage> {
     await prefs.setBool('remainLoggedIn', _remainLoggedIn);
   }
 
+  void _confirmLogin() {
+    if (_userRole != null) {
+      if (_userRole == 'User') {
+        Navigator.pop(context); //pop loading dialog
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) => NavBar(
+                    currentUser: _firebaseUser, currentUserRole: _userRole)));
+      } else if (_userRole == 'Store') {
+        Navigator.pop(context); //pop loading dialog
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) => NavBar(
+                    currentUser: _firebaseUser, currentUserRole: _userRole)));
+      } else {
+        print('THE USER\'S ROLE: ' + _userRole);
+      }
+    } else {
+      print('FAILED - USER ROLE IS NULL');
+    }
+  }
+
   Future<void> login() async {
     final formState = _formKey.currentState;
 
@@ -187,14 +274,21 @@ class LoginPageState extends State<LoginPage> {
       try {
         AuthResult result = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: _email, password: _password);
-        FirebaseUser user = result.user;
+        _firebaseUser = result.user;
 
         saveRemainLoggedIn();
 
-        Navigator.pop(context); //pop loading dialog
-        //Navigator.push(context, MaterialPageRoute<void>(builder: (context) => NavBar()));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute<void>(builder: (context) => NavBar()));
+        print('data herefter');
+
+        ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
+          snapshot.documents.forEach((f) {
+            print('DATA: ${f.data}}');
+            if (f.documentID == _firebaseUser.uid) {
+              _userRole = f.data['role'];
+            }
+          });
+        });
+        Future.delayed(Duration(seconds: 2), () => _confirmLogin());
       } catch (e) {
         setState(() {
           _errorMessage = e.message;

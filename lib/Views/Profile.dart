@@ -1,4 +1,4 @@
-import 'package:Qpon/Login/LoginPage.dart';
+import 'package:Qpon/Views/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +14,7 @@ class ProfileView extends StatelessWidget{
           onPressed:(){
             saveRemainLoggedOut();
             Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
+            context, MaterialPageRoute(builder: (context) => LoginView()));
           },
         ),
         ),

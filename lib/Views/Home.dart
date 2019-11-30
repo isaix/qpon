@@ -1,9 +1,10 @@
+import 'package:Qpon/Components/HorizontalList.dart';
+import 'package:Qpon/Components/Slider.dart';
 import 'package:flutter/material.dart';
 import 'package:Qpon/Components/Card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'Home.dart';
-import 'Scanner.dart';
-import 'Map.dart';
+final databaseReference = Firestore.instance;
 
 class HomeView extends StatefulWidget {
   @override
@@ -13,21 +14,43 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  var _slides = [];
+
+  getData() {
+    databaseReference
+        .collection("settings")
+        .document("images")
+        .get()
+        .then((snapshot) {
+      setState(() {
+        _slides = snapshot.data["slider"];
+      });
+    });
+  }
 
   Widget build(BuildContext context) {
+    getData();
+
     return Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-        color: Colors.deepOrangeAccent[200],
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(children: <Widget>[
-            CardComponent(),
-            CardComponent(),
-            CardComponent(),
-            CardComponent(),
-            CardComponent(),
-            CardComponent(),
-            CardComponent(),
+            SliderComponent(slides: _slides),
+            HorizontalList(
+                height: 70,
+                title: "Categories",
+                items: [1, 2, 3, 4, 5, 6, 7, 8].map((i) {
+                  return Column(
+                    children: <Widget>[
+                      Flexible(
+                        child: Image(
+                            image: AssetImage('assets/images/icon${i}@3x.png')),
+                      )
+                    ],
+                  );
+                }).toList()),
+            HorizontalList(height: 10, title: "Nearby Locations", items: []),
+            CardComponent()
           ]),
         ));
   }

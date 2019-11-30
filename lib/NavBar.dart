@@ -2,7 +2,8 @@ import 'package:Qpon/Views/Profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Login/LoginPage.dart';
+import 'Views/LoginPage.dart';
+import 'Components/SearchBar.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
 import 'Views/Map.dart';
@@ -63,7 +64,7 @@ class NavBarState extends State<NavBar> {
                 onPressed: () {
                   saveRemainLoggedOut();
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
+                      MaterialPageRoute(builder: (context) => LoginView()));
                   },
                 ),
               ),

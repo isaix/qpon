@@ -1,16 +1,16 @@
 import 'package:Qpon/NavBar.dart';
-import 'package:Qpon/Login/RegisterPage.dart';
+import 'package:Qpon/Views/Register.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginView extends StatefulWidget {
   @override
-  LoginPageState createState() => LoginPageState();
+  LoginViewState createState() => LoginViewState();
 }
 
-class LoginPageState extends State<LoginPage> {
+class LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _email, _password, _errorMessage, _userRole, _userID;
   bool _remainLoggedIn = false;
@@ -112,7 +112,7 @@ class LoginPageState extends State<LoginPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                              builder: (context) => RegisterPage(),
+                              builder: (context) => RegisterView(),
                               fullscreenDialog: true));
                     },
                     child: Text('Don\'t have an account? Register here.'),

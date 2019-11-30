@@ -1,4 +1,4 @@
-package com.example.qpon
+package dk.dtu.vmau.qpon
 
 import android.os.Bundle
 

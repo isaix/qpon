@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   barcode_scan: ^0.0.3
+  cloud_firestore: ^0.12.10+2
   shared_preferences: "^0.5.4+5"
 
   # The following adds the Cupertino Icons font to your application.

@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:552809916715:android:4d06c7c7cee420523dfd6e",
+        "mobilesdk_app_id": "1:552809916715:android:5e7bd7e775ef24b13dfd6e",
         "android_client_info": {
-          "package_name": "com.example.qpon"
+          "package_name": "dk.dtu.vmau.qpon"
         }
       },
       "oauth_client": [
@@ -30,6 +30,13 @@
             {
               "client_id": "552809916715-cvevcuaasjqeb4pe3b2mnmc2ain4cpmo.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "552809916715-040vj01of574tdm9q9pgtvoota6372fq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.qpon"
+              }
             }
           ]
         }

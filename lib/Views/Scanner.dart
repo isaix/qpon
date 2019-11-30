@@ -3,8 +3,13 @@ import 'package:flutter/rendering.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ScannerView extends StatefulWidget {
+  const ScannerView({Key key, this.currentUser}) : super(key: key);
+  final FirebaseUser currentUser; 
+  //widget.currentUser.uid
+
   @override
   _ScannerState createState() => _ScannerState();
 }

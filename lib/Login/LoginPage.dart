@@ -12,12 +12,14 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _email, _password, _errorMessage, _userRole;
+  String _email, _password, _errorMessage, _userRole, _userID;
   bool _remainLoggedIn = false;
   final ref = Firestore.instance;
-  var emailTextController = new TextEditingController(text: "userdemo@qpon.com");
+  var emailTextController =
+      new TextEditingController(text: "userdemo@qpon.com");
   var passwordTextController = new TextEditingController(text: "12345678");
-  
+  FirebaseUser _firebaseUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -244,7 +246,17 @@ class LoginPageState extends State<LoginPage> {
       if (_userRole == 'User') {
         Navigator.pop(context); //pop loading dialog
         Navigator.pushReplacement(
-            context, MaterialPageRoute<void>(builder: (context) => NavBar()));
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) => NavBar(
+                    currentUser: _firebaseUser, currentUserRole: _userRole)));
+      } else if (_userRole == 'Store') {
+        Navigator.pop(context); //pop loading dialog
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<void>(
+                builder: (context) => NavBar(
+                    currentUser: _firebaseUser, currentUserRole: _userRole)));
       } else {
         print('THE USER\'S ROLE: ' + _userRole);
       }
@@ -262,7 +274,7 @@ class LoginPageState extends State<LoginPage> {
       try {
         AuthResult result = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: _email, password: _password);
-        FirebaseUser user = result.user;
+        _firebaseUser = result.user;
 
         saveRemainLoggedIn();
 
@@ -271,7 +283,7 @@ class LoginPageState extends State<LoginPage> {
         ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
           snapshot.documents.forEach((f) {
             print('DATA: ${f.data}}');
-            if (f.documentID == user.uid) {
+            if (f.documentID == _firebaseUser.uid) {
               _userRole = f.data['role'];
             }
           });

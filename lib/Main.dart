@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:Qpon/NavBar.dart';
+import 'package:Qpon/Views/Home.dart';
+import 'package:Qpon/Views/Login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Login/LoginPage.dart';
 
 void main(){
   Crashlytics.instance.enableInDevMode = true;
@@ -30,7 +31,8 @@ class QponState extends State<Qpon>{
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
     ),
-    home: _remainLoggedIn? new NavBar() : new LoginPage(),
+//    home: _remainLoggedIn? new NavBar() : new LoginView(),
+    home: NavBar(),
     );
   }
 

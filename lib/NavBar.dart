@@ -2,7 +2,7 @@ import 'package:Qpon/Views/Profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Views/LoginPage.dart';
+import 'Views/Login.dart';
 import 'Components/SearchBar.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';

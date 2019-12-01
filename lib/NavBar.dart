@@ -74,8 +74,8 @@ class NavBarState extends State<NavBar> {
       );
     } else {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('QPON'),
+        appBar: SearchBar(
+          height: 60,
         ),
         body: _pageOptions[_selectedPage],
         bottomNavigationBar: BottomNavigationBar(

@@ -49,8 +49,9 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   );
                 }).toList()),
-            HorizontalList(height: 10, title: "Nearby Locations", items: []),
-            CardComponent()
+            HorizontalList(height: 0, title: "Nearby Locations", items: []),
+            CardComponent(),
+            CardComponent(),
           ]),
         ));
   }

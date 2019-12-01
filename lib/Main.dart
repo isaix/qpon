@@ -31,6 +31,7 @@ class QponState extends State<Qpon>{
         primarySwatch: Colors.deepOrange,
     ),
     home: _remainLoggedIn? new NavBar() : new LoginView(),
+    debugShowCheckedModeBanner: false,
     );
   }
 

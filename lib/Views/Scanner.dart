@@ -55,6 +55,7 @@ class _ScannerState extends State<ScannerView> {
     );
   }
 
+
   Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();

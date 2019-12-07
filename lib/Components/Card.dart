@@ -12,7 +12,8 @@ class _CardComponentState extends State<CardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final planetThumbnail = new Container(
+
+    final cardThumbnail = new Container(
       margin: new EdgeInsets.symmetric(
           vertical: 16.0
       ),
@@ -41,7 +42,7 @@ class _CardComponentState extends State<CardComponent> {
         fontWeight: FontWeight.w600
     );
 
-    Widget _planetValue({String value, String image}) {
+    Widget _cardValue({String value, String image}) {
       return new Row(
           children: <Widget>[
             new Image.asset(image, height: 12.0),
@@ -71,13 +72,13 @@ class _CardComponentState extends State<CardComponent> {
           new Row(
             children: <Widget>[
               new Expanded(
-                  child: _planetValue(
+                  child: _cardValue(
                       value: "5 km",
                       image: 'assets/img/ic_distance.png')
 
               ),
               new Expanded(
-                  child: _planetValue(
+                  child: _cardValue(
                       value: "5 / 10",
                       image: 'assets/img/ic_gravity.png')
               )
@@ -108,15 +109,15 @@ class _CardComponentState extends State<CardComponent> {
 
 
     return new Container(
-        height: 120.0,
+        width: MediaQuery.of(context).size.width * 0.85,
         margin: const EdgeInsets.symmetric(
           vertical: 16.0,
-          horizontal: 24.0,
+//          horizontal: 24.0,
         ),
         child: new Stack(
           children: <Widget>[
             card,
-            planetThumbnail,
+            cardThumbnail,
           ],
         )
     );

@@ -15,6 +15,7 @@ class HorizontalList extends StatelessWidget {
     return Container(
         margin: EdgeInsets.symmetric(vertical: 15.0),
         child: Column(
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(

@@ -1,4 +1,5 @@
 import 'package:Qpon/Components/HorizontalList.dart';
+import 'package:Qpon/Components/Map.dart';
 import 'package:Qpon/Components/Slider.dart';
 import 'package:flutter/material.dart';
 import 'package:Qpon/Components/Card.dart';
@@ -72,6 +73,7 @@ class _HomeViewState extends State<HomeView> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
+
               ]),
             ),
           ),

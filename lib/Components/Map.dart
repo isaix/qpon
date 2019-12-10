@@ -1,47 +1,99 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
-class MapSample extends StatefulWidget {
+class MapComponent extends StatefulWidget {
   @override
-  State<MapSample> createState() => MapSampleState();
+  State<MapComponent> createState() => MapComponentState();
 }
 
-class MapSampleState extends State<MapSample> {
+class MapComponentState extends State<MapComponent> {
   Completer<GoogleMapController> _controller = Completer();
+  final Geolocator geolocator = Geolocator()
+    ..forceAndroidLocationManager;
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  Set<Marker> _markers = {};
+  List<Placemark> placemark;
 
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+  CameraPosition _currentLocation;
+  Set<Circle> circles;
+
+  @override
+  initState() {
+    super.initState();
+
+    _getCurrentLocation();
+    _getNearbyLocations();
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
+      body: _currentLocation == null
+          ? Container(
+        alignment: Alignment.center,
+        child: CircularProgressIndicator(),
+      )
+          : GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: _currentLocation,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        markers: _markers,
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: Text('To the lake!'),
-        icon: Icon(Icons.directions_boat),
+        onPressed: _refresh,
+        label: Text('Refresh'),
+        icon: Icon(Icons.refresh),
       ),
     );
   }
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+  _refresh() {
+    _getNearbyLocations();
   }
+
+  _getCurrentLocation() {
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _currentLocation = CameraPosition(
+            target: LatLng(position.latitude, position.longitude), zoom: 16);
+        circles = Set.from([
+          Circle(
+            circleId: CircleId('_current_location'),
+            center: LatLng(position.latitude, position.longitude),
+            radius: 4000,
+          )
+        ]);
+      });
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  _getNearbyLocations() {
+    Geolocator()
+        .placemarkFromAddress("Nørre Farimagsgade 57, 1364 København")
+        .then((List<Placemark> locations) {
+          setState(() {
+            _markers = locations.map((location) => Marker(
+              // This marker id can be anything that uniquely identifies each marker.
+              markerId: MarkerId(locations.toString()),
+              position: LatLng(location.position.latitude, location.position.longitude),
+              infoWindow: InfoWindow(
+                title: "Barkowski",
+                snippet: '${location.thoroughfare} ${location.subThoroughfare}',
+              ),
+              icon: BitmapDescriptor.defaultMarker,
+            )).toSet();
+          });
+    });
+  }
+
 }

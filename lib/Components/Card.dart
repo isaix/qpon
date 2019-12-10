@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CardComponent extends StatefulWidget {
+  final String title;
+  final String address;
+  final double distance;
+  final int stamps;
+
+  const CardComponent({Key key, this.title, this.address, this.distance, this.stamps}): super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _CardComponentState();
@@ -60,9 +67,9 @@ class _CardComponentState extends State<CardComponent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(height: 4.0),
-          new Text("Foodies", style: headerTextStyle),
+          new Text('${widget.title}', style: headerTextStyle),
           new Container(height: 10.0),
-          new Text("Amagerbrogade 51", style: subHeaderTextStyle),
+          new Text('${widget.address}', style: subHeaderTextStyle),
           new Container(
               margin: new EdgeInsets.symmetric(vertical: 8.0),
               height: 2.0,
@@ -73,13 +80,13 @@ class _CardComponentState extends State<CardComponent> {
             children: <Widget>[
               new Expanded(
                   child: _cardValue(
-                      value: "5 km",
+                      value: '${widget.distance} km',
                       image: 'assets/img/ic_distance.png')
 
               ),
               new Expanded(
                   child: _cardValue(
-                      value: "5 / 10",
+                      value: '${widget.stamps} / 10',
                       image: 'assets/img/ic_gravity.png')
               )
             ],

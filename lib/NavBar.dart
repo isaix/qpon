@@ -74,8 +74,8 @@ class NavBarState extends State<NavBar> {
       );
     } else {
       return Scaffold(
-        appBar: SearchBar(
-          height: 60,
+        appBar: AppBar(
+          title: Text('QPON'),
         ),
         body: _pageOptions[_selectedPage],
         bottomNavigationBar: BottomNavigationBar(
@@ -114,4 +114,6 @@ class NavBarState extends State<NavBar> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('remainLoggedIn', false);
   }
+
+
 }

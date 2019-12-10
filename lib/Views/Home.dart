@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:Qpon/Components/Card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 final databaseReference = Firestore.instance;
 
@@ -19,9 +20,15 @@ class _HomeViewState extends State<HomeView> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Position _currentPosition;
-  String _currentAddress;
+  List _slides = [];
+  List<Widget> _nearbyLocations = <Widget>[];
 
-  var _slides = [];
+  @override
+  initState() {
+    super.initState();
+    _getLocations();
+    _getCurrentLocation();
+  }
 
   Widget build(BuildContext context) {
     getData();
@@ -30,6 +37,7 @@ class _HomeViewState extends State<HomeView> {
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
         return SingleChildScrollView(
           child: Container(
+            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: viewportConstraints.maxHeight,
@@ -53,27 +61,7 @@ class _HomeViewState extends State<HomeView> {
                 HorizontalList(
                     height: 150,
                     title: "Nearby Locations",
-                    items: [CardComponent(), CardComponent()]),
-                Column(children: [
-                  _currentPosition == null
-                      ? CircularProgressIndicator()
-                      : Text(
-                          "LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}"),
-                  _currentAddress == null
-                      ? CircularProgressIndicator()
-                      : Text(_currentAddress),
-                ]),
-                RaisedButton(
-                  onPressed: () {
-                    _getCurrentLocation();
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Get Location",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-
+                    items: _nearbyLocations),
               ]),
             ),
           ),
@@ -101,26 +89,30 @@ class _HomeViewState extends State<HomeView> {
       setState(() {
         _currentPosition = position;
       });
-      _getAddressFromLatLng();
+//      _getLocations(_currentPosition);
     }).catchError((e) {
       print(e);
     });
   }
 
-  _getAddressFromLatLng() async {
-    try {
-      List<Placemark> p = await geolocator.placemarkFromCoordinates(
-          _currentPosition.latitude, _currentPosition.longitude);
-
-      Placemark place = p[0];
-
+  _getLocations() {
+    databaseReference.collection("stores").getDocuments().then((snapshot) {
       setState(() {
-        _currentAddress =
-            "${place.locality}, ${place.postalCode}, ${place.country}, ${place.thoroughfare}, ${place.subThoroughfare}, ${place.subLocality}, ";
+        _nearbyLocations = snapshot.documents
+            .map<Widget>((document) => CardComponent(
+                title: document.data['name'],
+                address:
+                    '${document.data['address']['street']} ${document.data['address']['number']}',
+                distance: 500,
+                stamps: 5))
+            .toList();
       });
-      _getAddressFromLatLng();
-    } catch (e) {
-      print(e);
-    }
+    });
+  }
+
+  _getDistance(LatLng start, LatLng destination) {
+    Geolocator()
+        .placemarkFromAddress("Nørre Farimagsgade 57, 1364 København");
+
   }
 }

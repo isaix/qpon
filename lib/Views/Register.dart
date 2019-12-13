@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -8,6 +9,7 @@ class RegisterView extends StatefulWidget {
 
 class RegisterViewState extends State<RegisterView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ref = Firestore.instance;
   String _email, _password, _errorMessage, _currentEmail;
 
   @override
@@ -129,6 +131,10 @@ class RegisterViewState extends State<RegisterView> {
         });
   }
 
+  void saveUser(String id, String role) async{
+    await ref.collection('users').document(id).setData({'role': role});
+  }
+
   Future<void> register() async {
     final formState = _formKey.currentState;
     if (formState.validate()) {
@@ -139,6 +145,9 @@ class RegisterViewState extends State<RegisterView> {
             .createUserWithEmailAndPassword(email: _email, password: _password);
         FirebaseUser user = result.user;
         //user.sendEmailVerification();
+
+        //save users to firestore as well, with user role
+        saveUser(user.uid, 'User');
 
         Navigator.pop(context); //pop loading dialog
 

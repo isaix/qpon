@@ -1,5 +1,7 @@
 import 'package:Qpon/NavBar.dart';
+import 'package:Qpon/Store/StoreHome.dart';
 import 'package:Qpon/Views/Register.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,13 +14,17 @@ class LoginView extends StatefulWidget {
 
 class LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _email, _password, _errorMessage, _userRole, _userID;
-  bool _remainLoggedIn = false;
   final ref = Firestore.instance;
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+
+  String _email, _password, _errorMessage, _userRole, _userID, _userFCMToken;
+  bool _remainLoggedIn = true;
+  FirebaseUser _firebaseUser;
+
+  //Auto-completed login credentials
   var emailTextController =
       new TextEditingController(text: "userdemo@qpon.com");
   var passwordTextController = new TextEditingController(text: "12345678");
-  FirebaseUser _firebaseUser;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +76,8 @@ class LoginViewState extends State<LoginView> {
                     decoration: InputDecoration(labelText: 'Password'),
                     obscureText: true,
                   ),
+                  
+                  /* Remain logged in
                   Padding(
                     padding: EdgeInsets.only(top: 8.0),
                     child: Row(
@@ -86,8 +94,9 @@ class LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
+                  */
                   Padding(
-                    padding: EdgeInsets.only(top: 4, bottom: 4),
+                    padding: EdgeInsets.only(top: 16, bottom: 4),
                     child: ButtonTheme(
                       child: RaisedButton(
                         onPressed: login,
@@ -241,22 +250,31 @@ class LoginViewState extends State<LoginView> {
     await prefs.setBool('remainLoggedIn', _remainLoggedIn);
   }
 
+  void saveUserInformation(String role, String id) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', role);
+    await prefs.setString('id', id);
+  }
+
   void _confirmLogin() {
     if (_userRole != null) {
+
+      saveUserInformation(_userRole, _firebaseUser.uid);
+
       if (_userRole == 'User') {
         Navigator.pop(context); //pop loading dialog
         Navigator.pushReplacement(
             context,
             MaterialPageRoute<void>(
                 builder: (context) => NavBar(
-                    currentUser: _firebaseUser, currentUserRole: _userRole)));
+                    currentUserID: _firebaseUser.uid)));
       } else if (_userRole == 'Store') {
         Navigator.pop(context); //pop loading dialog
         Navigator.pushReplacement(
             context,
             MaterialPageRoute<void>(
-                builder: (context) => NavBar(
-                    currentUser: _firebaseUser, currentUserRole: _userRole)));
+                builder: (context) => StoreHome(
+                    currentUserID: _firebaseUser.uid)));
       } else {
         print('THE USER\'S ROLE: ' + _userRole);
       }
@@ -289,7 +307,9 @@ class LoginViewState extends State<LoginView> {
             }
           });
         });
+
         Future.delayed(Duration(seconds: 2), () => _confirmLogin());
+
       } catch (e) {
         setState(() {
           _errorMessage = e.message;

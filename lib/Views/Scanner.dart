@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ScannerView extends StatefulWidget {
-  const ScannerView({Key key, this.currentUser}) : super(key: key);
-  final FirebaseUser currentUser; 
+  const ScannerView({Key key, this.currentUserID}) : super(key: key);
+  final String currentUserID; 
   //widget.currentUser.uid
 
   @override

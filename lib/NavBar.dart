@@ -13,8 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'Store/StoreHome.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({Key key, this.currentUserID})
-      : super(key: key);
+  const NavBar({Key key, this.currentUserID}) : super(key: key);
   final String currentUserID;
 
   @override
@@ -36,6 +35,43 @@ class NavBarState extends State<NavBar> {
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
+
+        var title = message['notification']['title'];
+        if (title == 'Coupon Response') {
+          var couponCount = message['data']['couponCount'];
+          print("coupons: " + couponCount);
+
+          Navigator.of(context, rootNavigator: false).pop();
+
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: new Text("Success!"),
+                content: new Text(
+                    "You recieved " + couponCount.toString() + " coupons."),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: new Text("Close"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  new FlatButton(
+                    child: new Text("Return"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      //Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest()));
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          print("awee");
+        }
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
@@ -98,9 +134,12 @@ class NavBarState extends State<NavBar> {
     await prefs.setBool('remainLoggedIn', false);
   }
 
-  void sendTokenToServer(String fcmToken) async{
+  void sendTokenToServer(String fcmToken) async {
     print("Token: " + fcmToken);
-    
-    await ref.collection('users').document(widget.currentUserID).updateData({'token': fcmToken});
+
+    await ref
+        .collection('users')
+        .document(widget.currentUserID)
+        .updateData({'token': fcmToken});
   }
 }

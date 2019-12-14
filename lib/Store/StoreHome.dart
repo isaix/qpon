@@ -1,13 +1,15 @@
-import 'package:Qpon/API/MessagingWidget.dart';
-import 'package:Qpon/Model/FirebaseMessage.dart';
+import 'dart:convert';
 import 'package:Qpon/Views/LoginPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'StoreRequestPage.dart';
 
 class StoreHome extends StatefulWidget {
   const StoreHome({Key key, this.currentUserID}) : super(key: key);
@@ -20,8 +22,6 @@ class StoreHome extends StatefulWidget {
 class _StoreState extends State<StoreHome> {
   final Firestore ref = Firestore.instance;
   final FirebaseMessaging _fcm = FirebaseMessaging();
-  FirebaseMessage _currentMessage =
-      FirebaseMessage(title: "Bob's Pizza", body: "Starting Value");
   String _fcmToken;
 
   @override
@@ -34,6 +34,18 @@ class _StoreState extends State<StoreHome> {
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
+        
+        var title = message['notification']['title'];
+        if(title == 'Coupon Request'){
+          var returnToken = message['data']['returnToken'];
+          print("token: " + returnToken);
+          //_recievedNotificationAlert(returnToken);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest(userToken: returnToken,)));
+        }
+        else{
+          print("awee");
+        }
+        
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
@@ -58,7 +70,7 @@ class _StoreState extends State<StoreHome> {
             child: Padding(
               padding: EdgeInsets.only(top: 30, bottom: 30),
               child: Text(
-                _currentMessage.title + _currentMessage.body,
+                'Bob\'s Pizza',
                 style: TextStyle(
                   fontSize: 25.0,
                 ),
@@ -87,16 +99,6 @@ class _StoreState extends State<StoreHome> {
               ),
             ),
           ),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: 30, bottom: 30),
-              child: RaisedButton(
-                  child: Text('send notification'),
-                  onPressed: () {
-                    sendNotification();
-                  }),
-            ),
-          ),
         ],
       ),
     );
@@ -119,19 +121,33 @@ class _StoreState extends State<StoreHome> {
     await ref.collection('users').document(widget.currentUserID).updateData({'token': fcmToken});
   }
 
-  Future sendNotification() async {
-    final response = await Messaging.sendTo(
-      title: "HEJ ISAAC!",
-      body: "test",
-      fcmToken:
-          "cErNZEfSg1Q:APA91bFG4uWBqoLGHpO0PRUvNhnnAowcMBbzCLS1FqA9SJAdAYYC_3ouvruYu9uIc-ZnjdgfxYxR7tXV0WUTwcmAmor-WGgVUbBiVSgi8ai7KhtsAJiSilZ12QuA6Z2Os2mSwlEwSJHW",
+  /*
+  void _recievedNotificationAlert(String from) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text("Success!"),
+          content: new Text("You got a notification from device with ID: " + from),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Return"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest(userToken: from,)));
+              },
+            ),
+          ],
+        );
+      },
     );
-
-    if (response.statusCode != 200) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content:
-            Text('[${response.statusCode}] Error message: ${response.body}'),
-      ));
-    }
   }
+  */
 }

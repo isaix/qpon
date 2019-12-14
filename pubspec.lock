@@ -198,6 +198,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  slider_button:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: e1673105944859b7736d3313e80af0b54382decb
+      url: "https://github.com/anirudhsharma392/Slider-Button"
+    source: git
+    version: "0.4.0"
   source_span:
     dependency: transitive
     description:

@@ -245,7 +245,7 @@ class _ScannerState extends State<ScannerView> {
             .then((QuerySnapshot snapshot) {
           snapshot.documents.forEach((f) {
             if (f.documentID == storeID) {
-              storeDescription = f.data['name'] + " - " + f.data['category'];
+              storeDescription = f.data['name'];
             } else {
               print("false");
             }

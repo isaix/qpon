@@ -1,24 +1,19 @@
+import 'package:Qpon/Components/Map.dart';
 import 'package:flutter/material.dart';
 
-class MapView extends StatelessWidget {
+class MapView extends StatefulWidget {
+  @override
+  MapViewState createState() => MapViewState();
+}
+
+class MapViewState extends State<MapView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 40, right: 40, bottom: 30),
-            child: Text(
-              'This widget will, once implemented, depict the location of stores on the map, in which it is possible to recieve coupons.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.center,
-      ),
+      alignment: Alignment.center,
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: MapComponent(),
     );
   }
 }

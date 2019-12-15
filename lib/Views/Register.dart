@@ -60,6 +60,8 @@ class RegisterViewState extends State<RegisterView> {
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
+
+
             Padding(
               padding: EdgeInsets.only(top: 8.0),
               child: RaisedButton(

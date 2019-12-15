@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CardComponent extends StatefulWidget {
+  final String title;
+  final String address;
+  final double distance;
+  final int stamps;
+
+  const CardComponent({Key key, this.title, this.address, this.distance, this.stamps}): super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _CardComponentState();
@@ -12,7 +19,8 @@ class _CardComponentState extends State<CardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final planetThumbnail = new Container(
+
+    final cardThumbnail = new Container(
       margin: new EdgeInsets.symmetric(
           vertical: 16.0
       ),
@@ -41,7 +49,7 @@ class _CardComponentState extends State<CardComponent> {
         fontWeight: FontWeight.w600
     );
 
-    Widget _planetValue({String value, String image}) {
+    Widget _cardValue({String value, String image}) {
       return new Row(
           children: <Widget>[
             new Image.asset(image, height: 12.0),
@@ -59,9 +67,9 @@ class _CardComponentState extends State<CardComponent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(height: 4.0),
-          new Text("Foodies", style: headerTextStyle),
+          new Text('${widget.title}', style: headerTextStyle),
           new Container(height: 10.0),
-          new Text("Amagerbrogade 51", style: subHeaderTextStyle),
+          new Text('${widget.address}', style: subHeaderTextStyle),
           new Container(
               margin: new EdgeInsets.symmetric(vertical: 8.0),
               height: 2.0,
@@ -71,14 +79,14 @@ class _CardComponentState extends State<CardComponent> {
           new Row(
             children: <Widget>[
               new Expanded(
-                  child: _planetValue(
-                      value: "5 km",
+                  child: _cardValue(
+                      value: '${widget.distance} km',
                       image: 'assets/img/ic_distance.png')
 
               ),
               new Expanded(
-                  child: _planetValue(
-                      value: "5 / 10",
+                  child: _cardValue(
+                      value: '${widget.stamps} / 10',
                       image: 'assets/img/ic_gravity.png')
               )
             ],
@@ -108,15 +116,15 @@ class _CardComponentState extends State<CardComponent> {
 
 
     return new Container(
-        height: 120.0,
+        width: MediaQuery.of(context).size.width * 0.85,
         margin: const EdgeInsets.symmetric(
           vertical: 16.0,
-          horizontal: 24.0,
+//          horizontal: 24.0,
         ),
         child: new Stack(
           children: <Widget>[
             card,
-            planetThumbnail,
+            cardThumbnail,
           ],
         )
     );

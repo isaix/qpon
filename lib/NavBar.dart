@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Views/LoginPage.dart';
+import 'Views/Login.dart';
 import 'Components/SearchBar.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
@@ -126,7 +126,7 @@ class NavBarState extends State<NavBar> {
               title: Text('Profile'),
             )
           ]),
-    );
+      );
   }
 
   void saveRemainLoggedOut() async {

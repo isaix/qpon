@@ -11,6 +11,7 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.transparent,
         child: SafeArea(
       child: Container(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),

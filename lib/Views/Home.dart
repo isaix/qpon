@@ -69,7 +69,6 @@ class _HomeViewState extends State<HomeView> {
                               stamps: 0,
                             ))
                         .toList()),
-                RaisedButton(onPressed: _saveLatLong)
               ]),
             ),
           ),

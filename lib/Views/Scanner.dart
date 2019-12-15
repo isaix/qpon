@@ -78,7 +78,7 @@ class _ScannerState extends State<ScannerView> {
   }
   */
 
-  static Future sendNotification(String title, String message, String storeToken, String myToken) async {
+  static Future sendNotification(String title, String message, String storeToken, String myToken, String userID) async {
     try {
       var url = 'https://fcm.googleapis.com/fcm/send';
       var header = {
@@ -90,7 +90,8 @@ class _ScannerState extends State<ScannerView> {
         'notification': {'title': title, 'body': message},
         'data': {
           'click_action': "FLUTTER_NOTIFICATION_CLICK",
-          'returnToken': myToken
+          'returnToken': myToken,
+          'userID': userID
         }
       };
 
@@ -184,7 +185,7 @@ class _ScannerState extends State<ScannerView> {
             new FlatButton(
               child: new Text("Send Request"),
               onPressed: () {
-                sendNotification("Coupon Request", "Test", storeToken, myToken);
+                sendNotification("Coupon Request", "Test", storeToken, myToken, widget.currentUserID);
                 Navigator.of(context).pop();
                 _waitingForResponse();
               },

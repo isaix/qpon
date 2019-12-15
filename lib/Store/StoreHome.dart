@@ -38,9 +38,10 @@ class _StoreState extends State<StoreHome> {
         var title = message['notification']['title'];
         if(title == 'Coupon Request'){
           var returnToken = message['data']['returnToken'];
+          var userID = message['data']['userID'];
           print("token: " + returnToken);
           //_recievedNotificationAlert(returnToken);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest(userToken: returnToken,)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest(userToken: returnToken, userID: userID, storeID: widget.currentUserID,)));
         }
         else{
           print("awee");

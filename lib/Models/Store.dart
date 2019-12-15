@@ -6,6 +6,15 @@ class Store {
   double latitude;
   double longitude;
   double distance;
+  String storeUserID;
+
+  String get userID{
+    return storeUserID;
+  }
+
+  set userID(String userID){
+    storeUserID = userID;
+  }
 
   Store.fromMap(Map snapshot, String id)
       :

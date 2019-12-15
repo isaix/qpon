@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -18,67 +19,177 @@ class ScannerView extends StatefulWidget {
 class _ScannerState extends State<ScannerView> {
   String barcode = "";
   final Firestore ref = Firestore.instance;
+  List<Store> storesList;
 
   @override
   initState() {
     super.initState();
+    _getStoreInformation();
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 40, right: 40, bottom: 30),
-          child: Text(
-            'In order to recieve your coupon, please scan the QR code presented to you by the store.',
-            textAlign: TextAlign.center,
+        Row(
+          children: <Widget>[
+            Expanded(
+              flex: 5,
+              child: Padding(
+                padding:
+                    EdgeInsets.only(left: 20, right: 10, top: 20, bottom: 20),
+                child: RaisedButton(
+                  onPressed: (){
+                    print('hej');
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(right: 5),
+                        child: Text('Redeem'),
+                      ),
+                      Icon(Icons.card_giftcard)
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 5,
+              child: Padding(
+                padding:
+                    EdgeInsets.only(left: 10, right: 20, top: 20, bottom: 20),
+                child: RaisedButton(
+                  onPressed: scan,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(right: 5),
+                        child: Text('Scanner'),
+                      ),
+                      Icon(Icons.camera_alt)
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        StreamBuilder<QuerySnapshot>(
+          stream: ref
+              .collection('users')
+              .document(widget.currentUserID)
+              .collection('coupons')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData) {
+              return Text('No data available.');
+            } else if (storesList == null) {
+              return Text('Loading');
+            } else if (storesList[0].userID == null) {
+              return Text('Loading');
+            } else {
+              return new ListView.builder(
+                itemCount: snapshot.data.documents.length,
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot documentSnapshot =
+                      snapshot.data.documents[index];
+                  String name = ' ';
+                  storesList.forEach((s) {
+                    if (s.userID == documentSnapshot.documentID) {
+                      name = s.name;
+                    }
+                  });
+
+                  return buildItem(documentSnapshot, name);
+                },
+              );
+            }
+          },
+        )
+      ],
+    );
+  }
+
+  Card buildItem(DocumentSnapshot documentSnapshot, String name){
+    return Card(
+      elevation: 8.0,
+      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+      child: Container(
+        decoration: BoxDecoration(color: Color(0xFF333366)),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0,),
+          leading: Container(
+            padding: EdgeInsets.only(right: 12.0),
+            decoration: new BoxDecoration(
+              border: new Border(
+                right: new BorderSide(
+                  width: 1.0,
+                  color: Colors.white24,
+                ),
+              ),
+            ),
+            child: Icon(Icons.category, color: Colors.white,),
+          ),
+          title: Text(
+            name,
             style: TextStyle(
-              fontSize: 16,
+              color: Colors.white
+            ),
+          ),
+          trailing: Text(
+            'Coupons: ' + documentSnapshot.data['count'].toString(),
+            style: TextStyle(
+              color: Colors.white
             ),
           ),
         ),
-        RaisedButton(
-          onPressed: scan,
-          child: new Text("Scan QR code"),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 30.0),
-          child: Text(
-            '(For testing) Scanned code is: ' + barcode,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      ],
-      mainAxisAlignment: MainAxisAlignment.center,
+      ),
     );
   }
 
-  /*
-  Future sendNotification(
-      String messageTitle, String messageBody, String storeToken, String myToken) async {
-    final response = await Messaging.sendTo(
-      title: messageTitle,
-      body: messageBody,
-      fcmToken: storeToken,
-    );
+  void _getStoreInformation() async {
+    await ref
+        .collection("stores")
+        .getDocuments()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        storesList = snapshot.documents
+            .map<Store>(
+                (document) => Store.fromMap(document.data, document.documentID))
+            .toList();
+      });
+    });
 
-    if (response.statusCode != 200) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content:
-            Text('[${response.statusCode}] Error message: ${response.body}'),
-      ));
-    }
+    await ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
+      snapshot.documents.forEach((f) {
+        print('DATA: ${f.data}}');
+        if (f.data['role'] == 'Store') {
+          storesList.forEach((s) {
+            if (s.id == f.data['storeID']) {
+              s.userID = f.documentID;
+              print('setting user id');
+            }
+          });
+        }
+      });
+    });
   }
-  */
 
-  static Future sendNotification(String title, String message, String storeToken, String myToken, String userID) async {
+  static Future sendNotification(String title, String message,
+      String storeToken, String myToken, String userID) async {
     try {
       var url = 'https://fcm.googleapis.com/fcm/send';
       var header = {
         "Content-Type": "application/json",
-        "Authorization": "key=AAAAgLYJ6Ss:APA91bGVLMjL00l7YzFPJIerp3aVpmiZDnozHIEJ4DEuD-FT0ifTQT_S7MpmZCaOi5PTTuNFNL64quQMbktec5V-mduFJ_pOQCYqfbZ6toMEFfVX_H9RLAvGTrofiwLIy2tg1M2fjMj8",
+        "Authorization":
+            "key=AAAAgLYJ6Ss:APA91bGVLMjL00l7YzFPJIerp3aVpmiZDnozHIEJ4DEuD-FT0ifTQT_S7MpmZCaOi5PTTuNFNL64quQMbktec5V-mduFJ_pOQCYqfbZ6toMEFfVX_H9RLAvGTrofiwLIy2tg1M2fjMj8",
       };
       var request = {
         'to': storeToken,
@@ -180,7 +291,8 @@ class _ScannerState extends State<ScannerView> {
             new FlatButton(
               child: new Text("Send Request"),
               onPressed: () {
-                sendNotification("Coupon Request", "Test", storeToken, myToken, widget.currentUserID);
+                sendNotification("Coupon Request", "Test", storeToken, myToken,
+                    widget.currentUserID);
                 Navigator.of(context).pop();
                 _waitingForResponse();
               },
@@ -193,11 +305,11 @@ class _ScannerState extends State<ScannerView> {
 
   void _waitingForResponse() {
     showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Dialog(
-              child: Padding(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
             padding: EdgeInsets.all(15.0),
             child: new Row(
               mainAxisSize: MainAxisSize.min,

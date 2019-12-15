@@ -1,12 +1,12 @@
+import 'package:Qpon/Models/Category.dart';
+import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
 
 class CardComponent extends StatefulWidget {
-  final String title;
-  final String address;
-  final double distance;
+  final Store store;
   final int stamps;
 
-  const CardComponent({Key key, this.title, this.address, this.distance, this.stamps}): super(key: key);
+  const CardComponent({Key key, this.store, this.stamps}): super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -26,7 +26,7 @@ class _CardComponentState extends State<CardComponent> {
       ),
       alignment: FractionalOffset.centerLeft,
       child: new Image(
-        image: new AssetImage("assets/img/mars.png"),
+        image: NetworkImage(widget.store.category.imageUrl) ?? AssetImage("assets/img/mars.png"),
         height: 92.0,
         width: 92.0,
       ),
@@ -67,9 +67,9 @@ class _CardComponentState extends State<CardComponent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(height: 4.0),
-          new Text('${widget.title}', style: headerTextStyle),
+          new Text('${widget.store.name}', style: headerTextStyle),
           new Container(height: 10.0),
-          new Text('${widget.address}', style: subHeaderTextStyle),
+          new Text('${widget.store.address.street} ${widget.store.address.number}', style: subHeaderTextStyle),
           new Container(
               margin: new EdgeInsets.symmetric(vertical: 8.0),
               height: 2.0,
@@ -80,7 +80,7 @@ class _CardComponentState extends State<CardComponent> {
             children: <Widget>[
               new Expanded(
                   child: _cardValue(
-                      value: '${formatDistance(widget.distance)}',
+                      value: '${formatDistance(widget.store.distance)}',
                       image: 'assets/img/ic_distance.png')
 
               ),

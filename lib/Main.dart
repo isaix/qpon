@@ -23,7 +23,7 @@ class Qpon extends StatefulWidget {
 
 class QponState extends State<Qpon>{
   bool _remainLoggedIn = false;
-  String _userRole, _userID;
+  String _userRole, _userID, _userEmail;
   final FirebaseMessaging _fcm = FirebaseMessaging();
 
   @override
@@ -52,7 +52,7 @@ class QponState extends State<Qpon>{
 
   Widget startingViewBasedOnRole(){
     if(_userRole == "User"){
-      return new NavBar(currentUserID: _userID,);
+      return new NavBar(currentUserID: _userID, currentUserEmail: _userEmail,);
     }
     else if(_userRole == "Store"){
       return new StoreHome(currentUserID: _userID);
@@ -73,10 +73,12 @@ class QponState extends State<Qpon>{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String role = prefs.getString('role');
     String id = prefs.getString('id');
+    String email = prefs.getString('email');
 
     setState(() {
       _userRole = role;
       _userID = id;
+      _userEmail = email;
     });
   }
 

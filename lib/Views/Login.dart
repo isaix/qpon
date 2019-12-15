@@ -248,16 +248,18 @@ class LoginViewState extends State<LoginView> {
     await prefs.setBool('remainLoggedIn', _remainLoggedIn);
   }
 
-  void saveUserInformation(String role, String id) async{
+  void saveUserInformation(String role, String id, String email) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('role', role);
     await prefs.setString('id', id);
+    await prefs.setString('email', email);
   }
 
   void _confirmLogin() {
     if (_userRole != null) {
 
-      saveUserInformation(_userRole, _firebaseUser.uid);
+      saveUserInformation(_userRole, _firebaseUser.uid, _email);
+      print('EMAIL HERE!!!!!!!!!!!!!!! ' + _email);
 
       if (_userRole == 'User') {
         Navigator.pop(context); //pop loading dialog
@@ -265,7 +267,7 @@ class LoginViewState extends State<LoginView> {
             context,
             MaterialPageRoute<void>(
                 builder: (context) => NavBar(
-                    currentUserID: _firebaseUser.uid)));
+                    currentUserID: _firebaseUser.uid, currentUserEmail: _email,)));
       } else if (_userRole == 'Store') {
         Navigator.pop(context); //pop loading dialog
         Navigator.pushReplacement(

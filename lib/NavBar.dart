@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:Qpon/Views/Profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,12 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
 import 'Views/Map.dart';
-import 'package:geolocator/geolocator.dart';
-
 
 class NavBar extends StatefulWidget {
-  const NavBar({Key key, this.currentUserID}) : super(key: key);
-  final String currentUserID;
+  const NavBar({Key key, this.currentUserID, this.currentUserEmail}) : super(key: key);
+  final String currentUserID, currentUserEmail;
 
   @override
   NavBarState createState() => NavBarState();
@@ -23,12 +19,10 @@ class NavBarState extends State<NavBar> {
   int _selectedPage = 0;
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final Firestore ref = Firestore.instance;
-  final PageStorageBucket bucket = PageStorageBucket();
 
   @override
   initState() {
     super.initState();
-    print('bucket $bucket');
 
     _fcm.onTokenRefresh.listen(sendTokenToServer);
     _fcm.getToken();
@@ -81,21 +75,17 @@ class NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     final _pageOptions = [
-      HomeView(key: PageStorageKey("HomeView")),
-      ScannerView(currentUserID: this.widget.currentUserID),
-      MapView(key: PageStorageKey("MapView")),
-      ProfileView(),
+      HomeView(),
+      ScannerView(currentUserID: this.widget.currentUserID,),
+      MapView(),
+      ProfileView(currentUserEmail: this.widget.currentUserEmail,),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: Text('QPON'),
       ),
-//      body: _pageOptions[_selectedPage],
-      body: PageStorage(
-        child: _pageOptions[_selectedPage],
-        bucket: bucket,
-      ),
+      body: _pageOptions[_selectedPage],
       bottomNavigationBar: BottomNavigationBar(
           //backgroundColor: Colors.redAccent,
           selectedItemColor: Colors.deepOrange,

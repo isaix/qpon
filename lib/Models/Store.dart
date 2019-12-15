@@ -20,7 +20,6 @@ class Store {
   }
 
 
-
   Store.fromMap(Map snapshot, String id)
       :
         id = id ?? '',
@@ -34,7 +33,7 @@ class Store {
     return {
       "name": name,
       "address": address.toJson(),
-      "category": category,
+      "category": category.toJson(),
       "latitude": latitude,
       "longitude": longitude,
     };

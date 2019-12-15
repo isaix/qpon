@@ -9,4 +9,12 @@ class Category {
         id = id ?? null,
         label = snapshot['label'] ?? null,
         imageUrl = snapshot['imageUrl'] ?? null;
+
+  toJson(){
+    return {
+      "id": id,
+      "label": label,
+      "imageUrl": imageUrl,
+    };
+  }
 }

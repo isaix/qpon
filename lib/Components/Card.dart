@@ -1,12 +1,13 @@
 import 'package:Qpon/Models/Category.dart';
 import 'package:Qpon/Models/Store.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class CardComponent extends StatefulWidget {
   final Store store;
   final int stamps;
 
-  const CardComponent({Key key, this.store, this.stamps}): super(key: key);
+  const CardComponent({Key key, this.store, this.stamps}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -15,50 +16,36 @@ class CardComponent extends StatefulWidget {
 }
 
 class _CardComponentState extends State<CardComponent> {
-
-
   @override
   Widget build(BuildContext context) {
-
     final cardThumbnail = new Container(
-      margin: new EdgeInsets.symmetric(
-          vertical: 16.0
-      ),
+      margin: new EdgeInsets.symmetric(vertical: 16.0),
       alignment: FractionalOffset.centerLeft,
       child: new Image(
-        image: NetworkImage(widget.store.category.imageUrl) ?? AssetImage("assets/img/mars.png"),
+        image: widget.store.category.imageUrl != null
+            ? NetworkImage(widget.store.category.imageUrl)
+            : AssetImage("assets/img/mars.png"),
         height: 92.0,
         width: 92.0,
       ),
     );
 
-    final baseTextStyle = const TextStyle(
-        fontFamily: 'Poppins'
-    );
+    final baseTextStyle = const TextStyle(fontFamily: 'Poppins');
     final regularTextStyle = baseTextStyle.copyWith(
         color: const Color(0xffb6b2df),
         fontSize: 9.0,
-        fontWeight: FontWeight.w400
-    );
-    final subHeaderTextStyle = regularTextStyle.copyWith(
-        fontSize: 12.0
-    );
+        fontWeight: FontWeight.w400);
+    final subHeaderTextStyle = regularTextStyle.copyWith(fontSize: 12.0);
     final headerTextStyle = baseTextStyle.copyWith(
-        color: Colors.white,
-        fontSize: 18.0,
-        fontWeight: FontWeight.w600
-    );
+        color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600);
 
     Widget _cardValue({String value, String image}) {
-      return new Row(
-          children: <Widget>[
-            new Image.asset(image, height: 12.0),
-            new Container(width: 8.0),
-            new Text(value, style: regularTextStyle),
-          ]
-      );
+      return new Row(children: <Widget>[
+        new Image.asset(image, height: 12.0),
+        new Container(width: 8.0),
+        new Text(value, style: regularTextStyle),
+      ]);
     }
-
 
     final cardContent = new Container(
       margin: new EdgeInsets.fromLTRB(76.0, 16.0, 16.0, 16.0),
@@ -67,34 +54,37 @@ class _CardComponentState extends State<CardComponent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(height: 4.0),
-          new Text('${widget.store.name}', style: headerTextStyle),
+          new AutoSizeText(
+            '${widget.store.name}',
+            style: headerTextStyle,
+            maxLines: 1,
+          ),
           new Container(height: 10.0),
-          new Text('${widget.store.address.street} ${widget.store.address.number}', style: subHeaderTextStyle),
+          new Text(
+              '${widget.store.address.street} ${widget.store.address.number}',
+              style: subHeaderTextStyle),
           new Container(
               margin: new EdgeInsets.symmetric(vertical: 8.0),
               height: 2.0,
               width: 18.0,
-              color: new Color(0xff00c6ff)
-          ),
+              color: new Color(0xff00c6ff)),
           new Row(
             children: <Widget>[
               new Expanded(
                   child: _cardValue(
                       value: '${formatDistance(widget.store.distance)}',
-                      image: 'assets/img/ic_distance.png')
-
-              ),
-              new Expanded(
-                  child: _cardValue(
-                      value: '${widget.stamps} / 10',
-                      image: 'assets/img/ic_gravity.png')
-              )
+                      image: 'assets/img/ic_distance.png')),
+              widget.stamps != null
+                  ? new Expanded(
+                      child: _cardValue(
+                          value: '${widget.stamps} / 10',
+                          image: 'assets/img/ic_gravity.png'))
+                  : Container()
             ],
           ),
         ],
       ),
     );
-
 
     final card = new Container(
       child: cardContent,
@@ -114,7 +104,6 @@ class _CardComponentState extends State<CardComponent> {
       ),
     );
 
-
     return new Container(
         width: MediaQuery.of(context).size.width * 0.85,
         margin: const EdgeInsets.symmetric(
@@ -126,13 +115,12 @@ class _CardComponentState extends State<CardComponent> {
             card,
             cardThumbnail,
           ],
-        )
-    );
+        ));
   }
 }
 
-formatDistance(double distance){
-  if(distance == null) return "";
-  if(distance >= 1000.0) return '${(distance/1000.0).toStringAsFixed(2)} Km' ;
-  return '${distance.toStringAsFixed(2)}';
+formatDistance(double distance) {
+  if (distance == null) return "";
+  if (distance >= 1000.0) return '${(distance / 1000.0).toStringAsFixed(2)} Km';
+  return '${distance.toStringAsFixed(2)} M';
 }

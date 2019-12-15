@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 var list = [1, 2, 3, 4, 1, 2, 3, 4];
 
@@ -7,7 +8,8 @@ class HorizontalList extends StatelessWidget {
   final String title;
   final double height;
 
-  const HorizontalList({Key key, @required this.items, @required this.title, @required this.height})
+  const HorizontalList(
+      {Key key, @required this.items, @required this.title, @required this.height})
       : super(key: key);
 
   @override
@@ -26,21 +28,21 @@ class HorizontalList extends StatelessWidget {
               ),
             ),
             Container(
-              height: height,
-              child: ListView.separated(
-                shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, int index) {
-                    return items[index];
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(
-                      width: 12,
-                    );
-                  },
-                  itemCount: items.length),
+                height: height,
+                child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (BuildContext context, int index) {
+                      return items[index];
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return SizedBox(
+                        width: 12,
+                      );
+                    },
+                    itemCount: items.length)
             )
           ],
         ));

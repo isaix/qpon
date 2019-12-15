@@ -1,16 +1,15 @@
+import 'dart:async';
+
 import 'package:Qpon/Views/Profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Views/Login.dart';
-import 'Components/SearchBar.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
 import 'Views/Map.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'Store/StoreHome.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 class NavBar extends StatefulWidget {
   const NavBar({Key key, this.currentUserID}) : super(key: key);
@@ -24,10 +23,12 @@ class NavBarState extends State<NavBar> {
   int _selectedPage = 0;
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final Firestore ref = Firestore.instance;
+  final PageStorageBucket bucket = PageStorageBucket();
 
   @override
   initState() {
     super.initState();
+    print('bucket $bucket');
 
     _fcm.onTokenRefresh.listen(sendTokenToServer);
     _fcm.getToken();
@@ -80,9 +81,9 @@ class NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     final _pageOptions = [
-      HomeView(),
+      HomeView(key: PageStorageKey("HomeView")),
       ScannerView(currentUserID: this.widget.currentUserID),
-      MapView(),
+      MapView(key: PageStorageKey("MapView")),
       ProfileView(),
     ];
 
@@ -90,7 +91,11 @@ class NavBarState extends State<NavBar> {
       appBar: AppBar(
         title: Text('QPON'),
       ),
-      body: _pageOptions[_selectedPage],
+//      body: _pageOptions[_selectedPage],
+      body: PageStorage(
+        child: _pageOptions[_selectedPage],
+        bucket: bucket,
+      ),
       bottomNavigationBar: BottomNavigationBar(
           //backgroundColor: Colors.redAccent,
           selectedItemColor: Colors.deepOrange,

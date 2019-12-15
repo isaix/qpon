@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:Qpon/Components/Card.dart';
+import 'package:Qpon/Models/Category.dart';
 import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart';
 
 class ScannerView extends StatefulWidget {
@@ -17,9 +20,11 @@ class ScannerView extends StatefulWidget {
 }
 
 class _ScannerState extends State<ScannerView> {
+  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+
   String barcode = "";
   final Firestore ref = Firestore.instance;
-  List<Store> storesList;
+  List<Store> _storesList;
 
   @override
   initState() {
@@ -88,9 +93,9 @@ class _ScannerState extends State<ScannerView> {
               return Text('Error: ${snapshot.error}');
             } else if (!snapshot.hasData) {
               return Text('No data available.');
-            } else if (storesList == null) {
+            } else if (_storesList == null) {
               return Text('Loading');
-            } else if (storesList[0].userID == null) {
+            } else if (_storesList[0].userID == null) {
               return Text('Loading');
             } else {
               return new ListView.builder(
@@ -100,19 +105,22 @@ class _ScannerState extends State<ScannerView> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot documentSnapshot =
                       snapshot.data.documents[index];
-                  String name = ' ';
-                  storesList.forEach((s) {
+                  Store store;
+                  _storesList.forEach((s) {
                     if (s.userID == documentSnapshot.documentID) {
-                      name = s.name;
+                      store = s;
                     }
                   });
-
-                  return buildItem(documentSnapshot, name);
+                  return CardComponent(store: store, stamps: documentSnapshot['count']);
+//                  return buildItem(documentSnapshot, store);
                 },
               );
             }
           },
-        )
+        ),
+//        _storesList != null ? _storesList.map((store) {
+//          CardComponent(store: store, stamps: 0);
+//        }) : Container()
       ],
     );
   }
@@ -154,32 +162,45 @@ class _ScannerState extends State<ScannerView> {
     );
   }
 
-  void _getStoreInformation() async {
-    await ref
-        .collection("stores")
-        .getDocuments()
-        .then((QuerySnapshot snapshot) {
-      setState(() {
-        storesList = snapshot.documents
-            .map<Store>(
-                (document) => Store.fromMap(document.data, document.documentID))
-            .toList();
-      });
+  void _getStoreInformation() {
+//    await ref
+//        .collection("stores")
+//        .getDocuments()
+//        .then((QuerySnapshot snapshot) {
+//      setState(() {
+//        _storesList = snapshot.documents
+//            .map<Store>(
+//                (document) => Store.fromMap(document.data, document.documentID))
+//            .toList();
+//      });
+//    });
+
+    ref
+    .collection("users").document(widget.currentUserID).collection("coupons").getDocuments().then((snapshot) {
+        List<DocumentSnapshot> coupons = snapshot.documents.map((document) => document).toList();
+        print("Coupons $coupons");
+        ref.collection("users").getDocuments().then((snapshot) {
+          print('document ${snapshot.documents}');
+          coupons.forEach((f) => print(f.toString()));
+          snapshot.documents.forEach((f) => print(f.toString()));
+          List storeUsers = snapshot.documents.where((document) => coupons.every((coupon) => coupon.documentID == document.documentID)).toList();
+          print('storeUsers $storeUsers');
+        });
     });
 
-    await ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
-      snapshot.documents.forEach((f) {
-        print('DATA: ${f.data}}');
-        if (f.data['role'] == 'Store') {
-          storesList.forEach((s) {
-            if (s.id == f.data['storeID']) {
-              s.userID = f.documentID;
-              print('setting user id');
-            }
-          });
-        }
-      });
-    });
+//    await ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
+//      snapshot.documents.forEach((f) {
+//        print('DATA: ${f.data}}');
+//        if (f.data['role'] == 'Store') {
+//          _storesList.forEach((s) {
+//            if (s.id == f.data['storeID']) {
+//              s.userID = f.documentID;
+//              print('setting user id');
+//            }
+//          });
+//        }
+//      });
+//    });
   }
 
   static Future sendNotification(String title, String message,
@@ -346,5 +367,52 @@ class _ScannerState extends State<ScannerView> {
         );
       },
     );
+  }
+
+  _getCurrentLocation() {
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+
+      _getLocationsAndCategories(position);
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+
+  _getLocationsAndCategories(currentPosition) {
+    ref
+        .collection("stores")
+        .getDocuments()
+        .then((snapshot) async {
+      List<Store> list = snapshot.documents
+          .map<Store>(
+              (document) => Store.fromMap(document.data, document.documentID))
+          .toList();
+
+      QuerySnapshot datasnapshot =
+      await ref.collection("categories").getDocuments();
+      List<Category> categories = datasnapshot.documents
+          .map<Category>((document) =>
+          Category.fromMap(document.data, document.documentID))
+          .toList();
+
+      list.forEach((store) async => {
+        store.distance = await Geolocator().distanceBetween(
+            currentPosition.latitude,
+            currentPosition.longitude,
+            store.latitude,
+            store.longitude),
+        store.category = categories
+            .singleWhere((category) => category.id == store.category.id)
+      });
+
+      if (this.mounted) {
+        setState(() {
+          _storesList = list.map<Store>((Store store) => store).toList();
+        });
+      }
+    });
   }
 }

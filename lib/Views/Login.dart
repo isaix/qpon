@@ -1,7 +1,6 @@
 import 'package:Qpon/NavBar.dart';
 import 'package:Qpon/Store/StoreHome.dart';
 import 'package:Qpon/Views/Register.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,9 +14,8 @@ class LoginView extends StatefulWidget {
 class LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ref = Firestore.instance;
-  final FirebaseMessaging _fcm = FirebaseMessaging();
 
-  String _email, _password, _errorMessage, _userRole, _userID, _userFCMToken;
+  String _email, _password, _errorMessage, _userRole;
   bool _remainLoggedIn = true;
   FirebaseUser _firebaseUser;
 

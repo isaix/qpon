@@ -58,13 +58,6 @@ class NavBarState extends State<NavBar> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  new FlatButton(
-                    child: new Text("Return"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      //Navigator.push(context, MaterialPageRoute(builder: (context) => StoreRequest()));
-                    },
-                  ),
                 ],
               );
             },

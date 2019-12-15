@@ -1,13 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:Qpon/API/MessagingWidget.dart';
 import 'package:http/http.dart';
 
 class ScannerView extends StatefulWidget {
@@ -22,7 +18,6 @@ class ScannerView extends StatefulWidget {
 class _ScannerState extends State<ScannerView> {
   String barcode = "";
   final Firestore ref = Firestore.instance;
-  final FirebaseMessaging _fcm = FirebaseMessaging();
 
   @override
   initState() {

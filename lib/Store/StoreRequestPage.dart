@@ -97,12 +97,10 @@ class _StoreRequestState extends State<StoreRequest> {
 
   void saveCoupons(int count) async {
     int currentCount = 0, totalCount;
-    bool documentExists = false;
-
-    //get current count, if any
 
     final snapshot = await ref.collection('users').document(widget.userID).collection('coupons').document(widget.storeID).get();
 
+    //check if document exists - create if it does not
     if(snapshot == null || !snapshot.exists){
       totalCount = count;
       ref.collection('users').document(widget.userID).collection('coupons').document(widget.storeID).setData({"count":totalCount});

@@ -1,5 +1,6 @@
 import 'package:Qpon/Components/HorizontalList.dart';
 import 'package:Qpon/Components/Slider.dart';
+import 'package:Qpon/Models/Category.dart';
 import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
 import 'package:Qpon/Components/Card.dart';
@@ -10,6 +11,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 final databaseReference = Firestore.instance;
 
 class HomeView extends StatefulWidget {
+  HomeView({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _HomeViewState();
@@ -21,7 +24,8 @@ class _HomeViewState extends State<HomeView> {
 
   Position _currentPosition;
   List _slides = [];
-  List<Store> _nearbyLocations = <Store>[];
+  List<Store> _nearbyLocations;
+  List<Category> _categories = <Category>[];
 
   @override
   initState() {
@@ -43,32 +47,28 @@ class _HomeViewState extends State<HomeView> {
               ),
               child: Column(children: <Widget>[
                 SliderComponent(slides: _slides),
-                HorizontalList(
+                _categories != null ? HorizontalList(
                     height: 70,
                     title: "Categories",
-                    items: [1, 2, 3, 4, 5, 6, 7, 8].map((i) {
+                    items: _categories.map((i) {
                       return Column(
                         children: <Widget>[
                           Flexible(
                             child: Image(
-                                image: AssetImage(
-                                    'assets/images/icon${i}@3x.png')),
+                                image: NetworkImage(i.imageUrl)),
                           )
                         ],
                       );
-                    }).toList()),
-                HorizontalList(
+                    }).toList()) : CircularProgressIndicator(),
+                _nearbyLocations != null ? HorizontalList(
                     height: 150,
                     title: "Nearby Locations",
                     items: _nearbyLocations
                         .map<CardComponent>((Store store) => CardComponent(
-                              title: store.name,
-                              address:
-                                  '${store.address.street} ${store.address.number}',
-                              distance: store.distance,
+                              store: store,
                               stamps: 0,
                             ))
-                        .toList()),
+                        .toList()) : CircularProgressIndicator(),
               ]),
             ),
           ),
@@ -123,30 +123,36 @@ class _HomeViewState extends State<HomeView> {
           _currentPosition = position;
         });
       }
-      _getLocations(_currentPosition);
+      _getLocationsAndCategories(_currentPosition);
     }).catchError((e) {
       print(e);
     });
   }
 
-  _getLocations(currentPosition) {
-    databaseReference.collection("stores").getDocuments().then((snapshot) {
+  _getLocationsAndCategories(currentPosition) {
+
+    databaseReference.collection("stores").getDocuments().then((snapshot) async {
       List<Store> list = snapshot.documents
           .map<Store>(
               (document) => Store.fromMap(document.data, document.documentID))
           .toList();
+
+      QuerySnapshot datasnapshot = await databaseReference.collection("categories").getDocuments();
+      List<Category> categories = datasnapshot.documents.map<Category>((document) => Category.fromMap(document.data, document.documentID)).toList();
 
       list.forEach((store) async => {
             store.distance = await Geolocator().distanceBetween(
                 currentPosition.latitude,
                 currentPosition.longitude,
                 store.latitude,
-                store.longitude)
+                store.longitude),
+            store.category = categories.singleWhere((category) => category.id == store.category.id)
           });
 
       if (this.mounted) {
         setState(() {
           _nearbyLocations = list.map<Store>((Store store) => store).toList();
+          _categories = categories;
         });
       }
     });

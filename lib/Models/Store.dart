@@ -1,18 +1,21 @@
+import 'package:Qpon/Models/Category.dart';
+
 class Store {
   String id;
   String name;
   Address address;
-  String category;
+  Category category;
   double latitude;
   double longitude;
   double distance;
+  String imageUrl;
 
   Store.fromMap(Map snapshot, String id)
       :
         id = id ?? '',
         name = snapshot['name'] ?? '',
         address = Address.fromMap(snapshot['address']) ?? '',
-        category = snapshot['category'] ?? '',
+        category = Category.fromMap(snapshot['category'], snapshot['category']['id'])?? null,
         latitude = snapshot['latitude'] ?? null,
         longitude = snapshot['longitude'] ?? null;
 

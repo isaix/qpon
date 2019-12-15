@@ -4,11 +4,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapComponent extends StatefulWidget {
+  MapComponent({Key key}) : super(key: key);
+
   @override
   State<MapComponent> createState() => MapComponentState();
 }
 
-class MapComponentState extends State<MapComponent> {
+class MapComponentState extends State<MapComponent> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   Completer<GoogleMapController> _controller = Completer();
   final Geolocator geolocator = Geolocator()
     ..forceAndroidLocationManager;
@@ -29,6 +33,7 @@ class MapComponentState extends State<MapComponent> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new Scaffold(
       body: _currentLocation == null
           ? Container(

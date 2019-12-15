@@ -1,5 +1,6 @@
 import 'package:Qpon/Components/HorizontalList.dart';
 import 'package:Qpon/Components/Slider.dart';
+import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
 import 'package:Qpon/Components/Card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,12 +21,11 @@ class _HomeViewState extends State<HomeView> {
 
   Position _currentPosition;
   List _slides = [];
-  List<Widget> _nearbyLocations = <Widget>[];
+  List<Store> _nearbyLocations = <Store>[];
 
   @override
   initState() {
     super.initState();
-    _getLocations();
     _getCurrentLocation();
   }
 
@@ -60,7 +60,16 @@ class _HomeViewState extends State<HomeView> {
                 HorizontalList(
                     height: 150,
                     title: "Nearby Locations",
-                    items: _nearbyLocations),
+                    items: _nearbyLocations
+                        .map<CardComponent>((Store store) => CardComponent(
+                              title: store.name,
+                              address:
+                                  '${store.address.street} ${store.address.number}',
+                              distance: store.distance,
+                              stamps: 0,
+                            ))
+                        .toList()),
+                RaisedButton(onPressed: _saveLatLong)
               ]),
             ),
           ),
@@ -75,9 +84,34 @@ class _HomeViewState extends State<HomeView> {
         .document("images")
         .get()
         .then((snapshot) {
-      setState(() {
-        _slides = snapshot.data["slider"];
-      });
+      if (this.mounted) {
+        setState(() {
+          _slides = snapshot.data["slider"];
+        });
+      }
+    });
+  }
+
+  _saveLatLong() {
+    databaseReference.collection("stores").getDocuments().then((snapshot) {
+      List<Store> list = snapshot.documents
+          .map<Store>(
+              (document) => Store.fromMap(document.data, document.documentID))
+          .toList();
+
+      list.forEach((Store store) async => {
+            Geolocator()
+                .placemarkFromAddress(
+                    '${store.address.street} ${store.address.number}, ${store.address.city} ${store.address.zipcode}')
+                .then((List<Placemark> locations) => {
+                      store.latitude = locations.single.position.latitude,
+                      store.longitude = locations.single.position.longitude,
+                      databaseReference
+                          .collection('stores')
+                          .document(store.id)
+                          .updateData(store.toJson())
+                    })
+          });
     });
   }
 
@@ -85,33 +119,37 @@ class _HomeViewState extends State<HomeView> {
     geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-//      _getLocations(_currentPosition);
+      if (this.mounted) {
+        setState(() {
+          _currentPosition = position;
+        });
+      }
+      _getLocations(_currentPosition);
     }).catchError((e) {
       print(e);
     });
   }
 
-  _getLocations() {
+  _getLocations(currentPosition) {
     databaseReference.collection("stores").getDocuments().then((snapshot) {
-      setState(() {
-        _nearbyLocations = snapshot.documents
-            .map<Widget>((document) => CardComponent(
-                title: document.data['name'],
-                address:
-                    '${document.data['address']['street']} ${document.data['address']['number']}',
-                distance: 500,
-                stamps: 5))
-            .toList();
-      });
+      List<Store> list = snapshot.documents
+          .map<Store>(
+              (document) => Store.fromMap(document.data, document.documentID))
+          .toList();
+
+      list.forEach((store) async => {
+            store.distance = await Geolocator().distanceBetween(
+                currentPosition.latitude,
+                currentPosition.longitude,
+                store.latitude,
+                store.longitude)
+          });
+
+      if (this.mounted) {
+        setState(() {
+          _nearbyLocations = list.map<Store>((Store store) => store).toList();
+        });
+      }
     });
-  }
-
-  _getDistance(LatLng start, LatLng destination) {
-    Geolocator()
-        .placemarkFromAddress("Nørre Farimagsgade 57, 1364 København");
-
   }
 }

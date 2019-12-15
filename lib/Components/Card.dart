@@ -80,7 +80,7 @@ class _CardComponentState extends State<CardComponent> {
             children: <Widget>[
               new Expanded(
                   child: _cardValue(
-                      value: '${widget.distance} km',
+                      value: '${formatDistance(widget.distance)}',
                       image: 'assets/img/ic_distance.png')
 
               ),
@@ -129,4 +129,10 @@ class _CardComponentState extends State<CardComponent> {
         )
     );
   }
+}
+
+formatDistance(double distance){
+  if(distance == null) return "";
+  if(distance >= 1000.0) return '${(distance/1000.0).toStringAsFixed(2)} Km' ;
+  return '${distance.toStringAsFixed(2)}';
 }

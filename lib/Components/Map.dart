@@ -78,6 +78,7 @@ class MapComponentState extends State<MapComponent> {
   }
 
   _getNearbyLocations() {
+
     Geolocator()
         .placemarkFromAddress("Nørre Farimagsgade 57, 1364 København")
         .then((List<Placemark> locations) {

@@ -2,19 +2,14 @@ import 'package:Qpon/Views/Profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Views/Login.dart';
-import 'Components/SearchBar.dart';
 import 'Views/Home.dart';
 import 'Views/Scanner.dart';
 import 'Views/Map.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'Store/StoreHome.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({Key key, this.currentUserID}) : super(key: key);
-  final String currentUserID;
+  const NavBar({Key key, this.currentUserID, this.currentUserEmail}) : super(key: key);
+  final String currentUserID, currentUserEmail;
 
   @override
   NavBarState createState() => NavBarState();
@@ -81,9 +76,9 @@ class NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final _pageOptions = [
       HomeView(),
-      ScannerView(currentUserID: this.widget.currentUserID),
+      ScannerView(currentUserID: this.widget.currentUserID,),
       MapView(),
-      ProfileView(),
+      ProfileView(currentUserEmail: this.widget.currentUserEmail,),
     ];
 
     return Scaffold(

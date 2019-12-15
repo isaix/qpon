@@ -13,6 +13,7 @@ class ProfileView extends StatelessWidget{
           child: Text('Log out'),
           onPressed:(){
             saveRemainLoggedOut();
+            clearUserInformation();
             Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginView()));
           },
@@ -20,6 +21,12 @@ class ProfileView extends StatelessWidget{
         ),
       ),
     );
+  }
+
+  void clearUserInformation() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', null);
+    await prefs.setString('id', null);
   }
 
   void saveRemainLoggedOut() async{

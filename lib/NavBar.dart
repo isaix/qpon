@@ -102,8 +102,8 @@ class NavBarState extends State<NavBar> {
               title: Text('Home'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt),
-              title: Text('Scanner'),
+              icon: Icon(Icons.call_to_action),
+              title: Text('Coupons'),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.map),

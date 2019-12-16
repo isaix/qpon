@@ -11,15 +11,6 @@ class Store {
   String imageUrl;
   String storeUserID;
 
-  String get userID{
-    return storeUserID;
-  }
-
-  set userID(String userID){
-    storeUserID = userID;
-  }
-
-
   Store.fromMap(Map snapshot, String id)
       :
         id = id ?? '',

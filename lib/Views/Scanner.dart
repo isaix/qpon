@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:Qpon/Components/Card.dart';
+import 'package:Qpon/Components/HorizontalList.dart';
 import 'package:Qpon/Models/Category.dart';
 import 'package:Qpon/Models/Store.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _ScannerState extends State<ScannerView> {
   @override
   initState() {
     super.initState();
-    _getStoreInformation();
+    _getCurrentLocation();
   }
 
   @override
@@ -42,39 +43,30 @@ class _ScannerState extends State<ScannerView> {
               flex: 5,
               child: Padding(
                 padding:
-                    EdgeInsets.only(left: 20, right: 10, top: 20, bottom: 20),
-                child: RaisedButton(
-                  onPressed: (){
-                    print('hej');
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(right: 5),
-                        child: Text('Redeem'),
-                      ),
-                      Icon(Icons.card_giftcard)
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 5,
-              child: Padding(
-                padding:
-                    EdgeInsets.only(left: 10, right: 20, top: 20, bottom: 20),
+                    EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 5),
                 child: RaisedButton(
                   onPressed: scan,
+                  color: Colors.deepOrange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(right: 5),
-                        child: Text('Scanner'),
+                        child: Text(
+                          'Scan',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                      Icon(Icons.camera_alt)
+                      Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      )
                     ],
                   ),
                 ),
@@ -82,125 +74,130 @@ class _ScannerState extends State<ScannerView> {
             ),
           ],
         ),
-        StreamBuilder<QuerySnapshot>(
-          stream: ref
-              .collection('users')
-              .document(widget.currentUserID)
-              .collection('coupons')
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData) {
-              return Text('No data available.');
-            } else if (_storesList == null) {
-              return Text('Loading');
-            } else if (_storesList[0].userID == null) {
-              return Text('Loading');
-            } else {
-              return new ListView.builder(
-                itemCount: snapshot.data.documents.length,
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot documentSnapshot =
-                      snapshot.data.documents[index];
-                  Store store;
-                  _storesList.forEach((s) {
-                    if (s.userID == documentSnapshot.documentID) {
-                      store = s;
-                    }
-                  });
-                  return CardComponent(store: store, stamps: documentSnapshot['count']);
-//                  return buildItem(documentSnapshot, store);
-                },
-              );
-            }
-          },
+        Container(
+          margin: EdgeInsets.only(left: 20, right: 20),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: ref
+                .collection('users')
+                .document(widget.currentUserID)
+                .collection('coupons')
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (!snapshot.hasData) {
+                return Text('No data available.');
+              } else if (_storesList == null) {
+                return Text('Loading');
+              } else if (_storesList[0].id == null) {
+                return Text('Loading');
+              } else if (_storesList[0].category == null) {
+                return Text('Loading');
+              } else {
+                return new ListView.builder(
+                  itemCount: snapshot.data.documents.length,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot documentSnapshot =
+                        snapshot.data.documents[index];
+                    Store store;
+                    _storesList.forEach((s) {
+                      if (s.storeUserID == documentSnapshot.documentID) {
+                        store = s;
+                      }
+                    });
+                    //return Text('hej' + store.id);
+                    return GestureDetector(
+                      child: CardComponent(
+                          store: store, stamps: documentSnapshot['count']),
+                      onTap: () {
+                        _redeem10Coupons(documentSnapshot['count'], documentSnapshot.documentID);
+                      },
+                    );
+                  },
+                );
+              }
+            },
+          ),
         ),
-//        _storesList != null ? _storesList.map((store) {
-//          CardComponent(store: store, stamps: 0);
-//        }) : Container()
       ],
     );
   }
 
-  Card buildItem(DocumentSnapshot documentSnapshot, String name){
-    return Card(
-      elevation: 8.0,
-      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-      child: Container(
-        decoration: BoxDecoration(color: Color(0xFF333366)),
-        child: ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0,),
-          leading: Container(
-            padding: EdgeInsets.only(right: 12.0),
-            decoration: new BoxDecoration(
-              border: new Border(
-                right: new BorderSide(
-                  width: 1.0,
-                  color: Colors.white24,
-                ),
+  void _redeem10Coupons(int count, String storeID) {
+    if (count < 10) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Error"),
+            content: new Text("You need 10 coupons to redeem them."),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-            ),
-            child: Icon(Icons.category, color: Colors.white,),
-          ),
-          title: Text(
-            name,
-            style: TextStyle(
-              color: Colors.white
-            ),
-          ),
-          trailing: Text(
-            'Coupons: ' + documentSnapshot.data['count'].toString(),
-            style: TextStyle(
-              color: Colors.white
-            ),
-          ),
-        ),
-      ),
-    );
+            ],
+          );
+        },
+      );
+    }
+    else{
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Warning!"),
+            content: new Text("You are about to redeem 10 coupons. Are you sure? \n\nMake sure you are present at the store, and that they approve beforehand."),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text("Redeem"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  confirmRedeemCoupons(count, storeID);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
-  void _getStoreInformation() {
-//    await ref
-//        .collection("stores")
-//        .getDocuments()
-//        .then((QuerySnapshot snapshot) {
-//      setState(() {
-//        _storesList = snapshot.documents
-//            .map<Store>(
-//                (document) => Store.fromMap(document.data, document.documentID))
-//            .toList();
-//      });
-//    });
+  void confirmRedeemCoupons(int count, String storeID){
 
-    ref
-    .collection("users").document(widget.currentUserID).collection("coupons").getDocuments().then((snapshot) {
-        List<DocumentSnapshot> coupons = snapshot.documents.map((document) => document).toList();
-        print("Coupons $coupons");
-        ref.collection("users").getDocuments().then((snapshot) {
-          print('document ${snapshot.documents}');
-          coupons.forEach((f) => print(f.toString()));
-          snapshot.documents.forEach((f) => print(f.toString()));
-          List storeUsers = snapshot.documents.where((document) => coupons.every((coupon) => coupon.documentID == document.documentID)).toList();
-          print('storeUsers $storeUsers');
-        });
-    });
+    int newCount = count - 10;
+    ref.collection('users').document(widget.currentUserID).collection('coupons').document(storeID).setData({"count":newCount});
 
-//    await ref.collection("users").getDocuments().then((QuerySnapshot snapshot) {
-//      snapshot.documents.forEach((f) {
-//        print('DATA: ${f.data}}');
-//        if (f.data['role'] == 'Store') {
-//          _storesList.forEach((s) {
-//            if (s.id == f.data['storeID']) {
-//              s.userID = f.documentID;
-//              print('setting user id');
-//            }
-//          });
-//        }
-//      });
-//    });
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Congratulations"),
+            content: new Text("You have successfully redeemed 10 coupons.\n\nEnjoy your reward."),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Close"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
   }
 
   static Future sendNotification(String title, String message,
@@ -373,39 +370,56 @@ class _ScannerState extends State<ScannerView> {
     geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
-
       _getLocationsAndCategories(position);
     }).catchError((e) {
       print(e);
     });
   }
 
-
   _getLocationsAndCategories(currentPosition) {
-    ref
-        .collection("stores")
-        .getDocuments()
-        .then((snapshot) async {
+    ref.collection("stores").getDocuments().then((snapshot) async {
       List<Store> list = snapshot.documents
           .map<Store>(
               (document) => Store.fromMap(document.data, document.documentID))
           .toList();
 
+      list.forEach((s) {
+        print("ID: " + s.id);
+      });
+
       QuerySnapshot datasnapshot =
-      await ref.collection("categories").getDocuments();
+          await ref.collection("categories").getDocuments();
       List<Category> categories = datasnapshot.documents
           .map<Category>((document) =>
-          Category.fromMap(document.data, document.documentID))
+              Category.fromMap(document.data, document.documentID))
           .toList();
 
-      list.forEach((store) async => {
+      list.forEach((store) async {
         store.distance = await Geolocator().distanceBetween(
             currentPosition.latitude,
             currentPosition.longitude,
             store.latitude,
-            store.longitude),
+            store.longitude);
+
         store.category = categories
-            .singleWhere((category) => category.id == store.category.id)
+            .singleWhere((category) => category.id == store.category.id);
+      });
+
+      await ref
+          .collection("users")
+          .getDocuments()
+          .then((QuerySnapshot snapshot) {
+        snapshot.documents.forEach((f) {
+          print('DATA: ${f.data}}');
+          if (f.data['role'] == 'Store') {
+            list.forEach((s) {
+              if (s.id == f.data['storeID']) {
+                s.storeUserID = f.documentID;
+                print('setting user id');
+              }
+            });
+          }
+        });
       });
 
       if (this.mounted) {
